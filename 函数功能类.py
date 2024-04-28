@@ -1,6 +1,7 @@
 import win32con
 import win32gui
 
+from 识字类 import *
 from 键鼠类 import *
 
 
@@ -20,21 +21,38 @@ def 启动游戏():
     pass
 
 
-def 进图():
-    key_press_release('down', 3)
+def 从城镇进图():
+    key_press_release('down', 1.5)
     key_press_release('1')
+    time.sleep(3)
+    mouse_mov_click(比拉谢尔面板[0], 比拉谢尔面板[1])
+    time.sleep(0.5)
+    mouse_mov_click(比拉谢尔面板_毁坏的克洛诺斯岛[0], 比拉谢尔面板_毁坏的克洛诺斯岛[1])
+    key_press_release('space')
+    time.sleep(0.5)
+    key_press_release('right', 3)
 
 
 def 进入赛利亚房间():
     key_press_release('esc')
     time.sleep(0.01)
-    mouse_move(374, 490)  # 移动鼠标到(500, 500)
-    mouse_click()  # 单击鼠标左键
+    mouse_mov_click(设置_选择角色[0], 设置_选择角色[1])
     time.sleep(0.5)
-    key_press_release(' ')  # 模拟空格键单击
+    key_press_release('space')  # 模拟空格键单击
+
+
+def 关闭公告():
+    mouse_mov_click((公告_关闭[0] + 公告_关闭[2]) / 2, (公告_关闭[1] + 公告_关闭[3]) / 2)
+
+
+def 选图(地图名):
+    识字 = 识字初始化()
+    while 识字.获取所选地图名称() != 地图名:
+        key_press_release('down')
+    key_press_release('space')
 
 
 # 调用函数
 if __name__ == '__main__':
-    time.sleep(3)
-    key_press_release(' ')
+    time.sleep(2)
+    选图(地图名)

@@ -1,46 +1,30 @@
 import numpy as np
-import win32gui
-import win32ui
-import win32con
-import win32api
 from PIL import Image, ImageOps
 from paddleocr import PaddleOCR
+import mss
+
 
 import logging
+
+from 数据 import *
 
 # 设置ppocr的日志级别为WARNING，这将关闭DEBUG信息
 logging.getLogger('ppocr').setLevel(logging.WARNING)
 
 class 识字初始化:
-    人物 = (636, 31, 662, 45)
-    赛丽亚 = (424,178,466,198)
+
     def __init__(self):
-        hdesktop = win32gui.GetDesktopWindow()
-        width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
-        height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
-        left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
-        top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
-
-        desktop_dc = win32gui.GetWindowDC(hdesktop)
-        img_dc = win32ui.CreateDCFromHandle(desktop_dc)
-        mem_dc = img_dc.CreateCompatibleDC()
-
-        screenshot = win32ui.CreateBitmap()
-        screenshot.CreateCompatibleBitmap(img_dc, width, height)
-        mem_dc.SelectObject(screenshot)
-        mem_dc.BitBlt((0, 0), (width, height), img_dc, (left, top), win32con.SRCCOPY)
-
-        signedIntsArray = screenshot.GetBitmapBits(True)
-        self.img = Image.frombuffer('RGB', (width, height), signedIntsArray, 'raw', 'BGRX', 0, 1)
-
-        mem_dc.DeleteDC()
-        win32gui.ReleaseDC(hdesktop, desktop_dc)
-        win32gui.DeleteObject(screenshot.GetHandle())
-
-
+        pass
     def 识字(self, region):
+
+        with mss.mss() as sct:
+            # 捕获指定区域的屏幕
+            sct_img = sct.grab(region)
+            # 将捕获的数据转换为PIL.Image对象
+            self.img = Image.frombytes('RGB', (sct_img.width, sct_img.height), sct_img.rgb)
         ocr = PaddleOCR()
-        cropped_image = self.img.crop(region)
+        cropped_image = self.img
+        # cropped_image = self.img.crop(region)
         # 计算新的尺寸，假设我们想要放大到原来的两倍
         h, w = cropped_image.height, cropped_image.width
         border = [0, 0]
@@ -63,20 +47,31 @@ class 识字初始化:
             return ""
 
     def in城镇(self):
-        字符 = self.识字(self.人物)
+        字符 = self.识字(人物)
         if 字符=="人物":
             return True
         else:
             return False
 
     def in赛利亚房间(self):
-        字符 = self.识字(self.赛丽亚)
+        字符 = self.识字(赛丽亚)
         if 字符 == "赛丽亚":
             return True
         else:
             return False
+    def is公告界面(self):
+        字符 = self.识字(公告_关闭)
+        if 字符 == "关闭":
+            return True
+        else:
+            return False
 
-
+    def 获取所选地图名称(self):
+        字符 = self.识字(所选地图名字)
+        if 字符 != "":
+            return 字符
+        else:
+            return ""
 if __name__ == '__main__':
     识字 = 识字初始化()
-    print(识字.in赛利亚房间())
+    print(识字.in城镇())
