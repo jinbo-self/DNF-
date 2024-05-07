@@ -17,6 +17,9 @@ class 识字初始化:
         self.ocr = PaddleOCR()
         self.sct = mss.mss()
 
+    def get_sct(self):
+        return self.sct
+
     def 识字(self, region):
 
         sct_img = self.sct.grab(region)
@@ -92,15 +95,21 @@ class 识字初始化:
                 (当前房间x, 当前房间y - 房间高度, 当前房间x + 房间宽度, 当前房间y)) == '？':
             return True
         #当前房间右边
-        elif self.识字((当前房间x + 房间宽度, 当前房间y, 当前房间x + 房间宽度*2, 当前房间y + 房间高度)) == '?' or self.识字(
-                (当前房间x + 房间宽度, 当前房间y, 当前房间x + 房间宽度*2, 当前房间y + 房间高度)) == '？':
+        elif self.识字(
+                (当前房间x + 房间宽度, 当前房间y, 当前房间x + 房间宽度 * 2, 当前房间y + 房间高度)) == '?' or self.识字(
+                (当前房间x + 房间宽度, 当前房间y, 当前房间x + 房间宽度 * 2, 当前房间y + 房间高度)) == '？':
             return True
         # 当前房间下边
-        elif self.识字((当前房间x, 当前房间y + 房间高度, 当前房间x + 房间宽度, 当前房间y+2*房间高度)) == '?' or self.识字(
-            (当前房间x, 当前房间y + 房间高度, 当前房间x + 房间宽度, 当前房间y+2*房间高度)) == '？':
+        elif self.识字(
+                (当前房间x, 当前房间y + 房间高度, 当前房间x + 房间宽度, 当前房间y + 2 * 房间高度)) == '?' or self.识字(
+                (当前房间x, 当前房间y + 房间高度, 当前房间x + 房间宽度, 当前房间y + 2 * 房间高度)) == '？':
             return True
         else:
             return False
+
+    def is通关(self):
+        pass
+
 
 if __name__ == '__main__':
     识字 = 识字初始化()

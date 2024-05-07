@@ -141,15 +141,249 @@ def 过图():
     pass
 
 
-def 跑到目标(目的坐标, model, sct, 识字, 横轴偏差=0, 纵轴偏差=0):
-    人物坐标 = 获取人物坐标(model, sct)
-    if 人物坐标 == (0, 0):
+def 跑到目标(目的坐标, model, sct, 按键, 横轴偏差=0, 纵轴偏差=0):
+    当前时间 = 0
+    上次坐标时间 = 0
+    上次坐标 = (0, 0)
+    实时坐标 = (0, 0)
+    上次房间时间 = 0
+    上次房间坐标 = (0, 0)
+    实时房间坐标 = (0, 0)
+    实时坐标 = 获取人物坐标(model, sct)
+    if 实时坐标 == (0, 0):
         return
     上次房间坐标 = 取当前房间(sct)
     if 上次房间坐标 == (0, 0):
         return
-    if is距离近(人物坐标, 目的坐标, 120, 40):
-        pass
+    if is距离近(实时坐标, 目的坐标, 120, 40):
+        走到目标(目的坐标, model, sct, 按键)
+        return
+        # 向右走
+    if 目的坐标[0] > 实时坐标[0] and 目的坐标[1] == 实时坐标[1]:
+        按键.key_press_release('right')
+        按键.key_press('right')
+        while True:
+            当前时间 = time.time()
+            if 目的坐标[0] <= 实时坐标[0] + 横轴偏差:
+                按键.release_all_keys()
+                return
+            if 当前时间 - 上次坐标时间 > 500:  # 判断边缘
+                if 实时坐标[0] == 上次坐标[0]:
+                    按键.release_all_keys()
+                    return
+                上次坐标 = 实时坐标
+                上次坐标时间 = 当前时间
+            if 当前时间 - 上次房间时间 > 500:  # 判断下个房间
+                实时房间坐标 = 取当前房间(sct)
+                if 实时房间坐标[0] != 上次房间坐标[0] or 实时房间坐标[1] != 上次房间坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次房间坐标 = 实时房间坐标
+                上次房间时间 = 当前时间
+            实时坐标 = 获取人物坐标(model, sct)
+    # 向左走
+    if 目的坐标[0] < 实时坐标[0] and 目的坐标[1] == 实时坐标[1]:
+        按键.key_press_release('left')
+        按键.key_press('left')
+        while True:
+            当前时间 = time.time()
+            if 目的坐标[0] >= 实时坐标[0] - 横轴偏差:
+                按键.release_all_keys()
+                return
+            if 当前时间 - 上次坐标时间 > 500:  # 判断边缘
+                if 实时坐标[0] == 上次坐标[0]:
+                    按键.release_all_keys()
+                    return
+                上次坐标 = 实时坐标
+                上次坐标时间 = 当前时间
+            if 当前时间 - 上次房间时间 > 500:  # 判断下个房间
+                实时房间坐标 = 取当前房间(sct)
+                if 实时房间坐标[0] != 上次房间坐标[0] or 实时房间坐标[1] != 上次房间坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次房间坐标 = 实时房间坐标
+                上次房间时间 = 当前时间
+            实时坐标 = 获取人物坐标(model, sct)
+    # 向下走
+    if 目的坐标[1] > 实时坐标[1] and 目的坐标[0] == 实时坐标[0]:
+        按键.key_press('down')
+        while True:
+            当前时间 = time.time()
+            if 目的坐标[1] <= 实时坐标[1] + 纵轴偏差:  # 判断抵达
+                按键.release_all_keys()
+                return
+            if 当前时间 - 上次坐标时间 > 500:  # 判断边缘
+                if 实时坐标[1] == 上次坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次坐标 = 实时坐标
+                上次坐标时间 = 当前时间
+            if 当前时间 - 上次房间时间 > 500:  # 判断下个房间
+                实时房间坐标 = 取当前房间(sct)
+                if 实时房间坐标[0] != 上次房间坐标[0] or 实时房间坐标[1] != 上次房间坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次房间坐标 = 实时房间坐标
+                上次房间时间 = 当前时间
+            实时坐标 = 获取人物坐标(model, sct)
+    # 向上走
+    if 目的坐标[1] < 实时坐标[1] and 目的坐标[0] == 实时坐标[0]:
+        按键.key_press('up')
+        while True:
+            当前时间 = time.time()
+            if 目的坐标[1] >= 实时坐标[1] - 纵轴偏差:  # 判断抵达
+                按键.release_all_keys()
+                return
+            if 当前时间 - 上次坐标时间 > 500:  # 判断边缘
+                if 实时坐标[1] == 上次坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次坐标 = 实时坐标
+                上次坐标时间 = 当前时间
+            if 当前时间 - 上次房间时间 > 500:  # 判断下个房间
+                实时房间坐标 = 取当前房间(sct)
+                if 实时房间坐标[0] != 上次房间坐标[0] or 实时房间坐标[1] != 上次房间坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次房间坐标 = 实时房间坐标
+                上次房间时间 = 当前时间
+            实时坐标 = 获取人物坐标(model, sct)
+    # 向右上走
+    if 目的坐标[0] > 实时坐标[0] and 目的坐标[1] < 实时坐标[1]:
+        按键.key_press_release('right')
+        按键.key_press('right')
+        按键.key_press('up')
+        while True:
+            当前时间 = time.time()
+            if 目的坐标[0] <= 实时坐标[0] + 横轴偏差:
+                按键.key_release('right')
+
+            if 目的坐标[1] >= 实时坐标[1] - 纵轴偏差:
+                按键.key_release('up')
+
+            if 目的坐标[0] <= 实时坐标[0] + 横轴偏差 and 目的坐标[1] >= 实时坐标[1] - 纵轴偏差:  # 判断抵达
+                按键.release_all_keys()
+                return
+            if 当前时间 - 上次坐标时间 > 500:  # 判断边缘
+                if 实时坐标[0] == 上次坐标[0]:
+                    按键.key_release('right')
+                if 实时坐标[1] == 上次坐标[1]:
+                    按键.key_release('up')
+                if 实时坐标[0] == 上次坐标[0] and 实时坐标[1] == 上次坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次坐标 = 实时坐标
+                上次坐标时间 = 当前时间
+            if 当前时间 - 上次房间时间 > 500:  # 判断下个房间
+                实时房间坐标 = 取当前房间(sct)
+                if 实时房间坐标[0] != 上次房间坐标[0] or 实时房间坐标[1] != 上次房间坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次房间坐标 = 实时房间坐标
+                上次房间时间 = 当前时间
+            实时坐标 = 获取人物坐标(model, sct)
+    # 向右下走
+    if 目的坐标[0] > 实时坐标[0] and 目的坐标[1] > 实时坐标[1]:
+        按键.key_press_release('right')
+        按键.key_press('right')
+        按键.key_press('down')
+        while True:
+            当前时间 = time.time()
+            if 目的坐标[0] <= 实时坐标[0] + 横轴偏差:
+                按键.key_release('right')
+
+            if 目的坐标[1] <= 实时坐标[1] + 纵轴偏差:
+                按键.key_release('down')
+
+            if 目的坐标[0] <= 实时坐标[0] + 横轴偏差 and 目的坐标[1] <= 实时坐标[1] + 纵轴偏差:  # 判断抵达
+                按键.release_all_keys()
+                return
+            if 当前时间 - 上次坐标时间 > 500:  # 判断边缘
+                if 实时坐标[0] == 上次坐标[0]:
+                    按键.key_release('right')
+                if 实时坐标[1] == 上次坐标[1]:
+                    按键.key_release('down')
+                if 实时坐标[0] == 上次坐标[0] and 实时坐标[1] == 上次坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次坐标 = 实时坐标
+                上次坐标时间 = 当前时间
+            if 当前时间 - 上次房间时间 > 500:  # 判断下个房间
+                实时房间坐标 = 取当前房间(sct)
+                if 实时房间坐标[0] != 上次房间坐标[0] or 实时房间坐标[1] != 上次房间坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次房间坐标 = 实时房间坐标
+                上次房间时间 = 当前时间
+            实时坐标 = 获取人物坐标(model, sct)
+    # 向左上走
+    if 目的坐标[0] < 实时坐标[0] and 目的坐标[1] < 实时坐标[1]:
+        按键.key_press_release('left')
+        按键.key_press('left')
+        按键.key_press('up')
+        while True:
+            当前时间 = time.time()
+            if 目的坐标[0] >= 实时坐标[0] - 横轴偏差:
+                按键.key_release('left')
+
+            if 目的坐标[1] >= 实时坐标[1] - 纵轴偏差:
+                按键.key_release('up')
+
+            if 目的坐标[0] >= 实时坐标[0] - 横轴偏差 and 目的坐标[1] >= 实时坐标[1] - 纵轴偏差:  # 判断抵达
+                按键.release_all_keys()
+                return
+            if 当前时间 - 上次坐标时间 > 500:  # 判断边缘
+                if 实时坐标[0] == 上次坐标[0]:
+                    按键.key_release('left')
+                if 实时坐标[1] == 上次坐标[1]:
+                    按键.key_release('up')
+                if 实时坐标[0] == 上次坐标[0] and 实时坐标[1] == 上次坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次坐标 = 实时坐标
+                上次坐标时间 = 当前时间
+            if 当前时间 - 上次房间时间 > 500:  # 判断下个房间
+                实时房间坐标 = 取当前房间(sct)
+                if 实时房间坐标[0] != 上次房间坐标[0] or 实时房间坐标[1] != 上次房间坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次房间坐标 = 实时房间坐标
+                上次房间时间 = 当前时间
+            实时坐标 = 获取人物坐标(model, sct)
+    # 向左下走
+    if 目的坐标[0] < 实时坐标[0] and 目的坐标[1] > 实时坐标[1]:
+        按键.key_press_release('left')
+        按键.key_press('left')
+        按键.key_press('down')
+        while True:
+            当前时间 = time.time()
+            if 目的坐标[0] >= 实时坐标[0] - 横轴偏差:
+                按键.key_release('left')
+
+            if 目的坐标[1] <= 实时坐标[1] + 纵轴偏差:
+                按键.key_release('down')
+
+            if 目的坐标[0] >= 实时坐标[0] - 横轴偏差 and 目的坐标[1] <= 实时坐标[1] + 纵轴偏差:  # 判断抵达
+                按键.release_all_keys()
+                return
+            if 当前时间 - 上次坐标时间 > 500:  # 判断边缘
+                if 实时坐标[0] == 上次坐标[0]:
+                    按键.key_release('left')
+                if 实时坐标[1] == 上次坐标[1]:
+                    按键.key_release('down')
+                if 实时坐标[0] == 上次坐标[0] and 实时坐标[1] == 上次坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次坐标 = 实时坐标
+                上次坐标时间 = 当前时间
+            if 当前时间 - 上次房间时间 > 500:  # 判断下个房间
+                实时房间坐标 = 取当前房间(sct)
+                if 实时房间坐标[0] != 上次房间坐标[0] or 实时房间坐标[1] != 上次房间坐标[1]:
+                    按键.release_all_keys()
+                    return
+                上次房间坐标 = 实时房间坐标
+                上次房间时间 = 当前时间
+            实时坐标 = 获取人物坐标(model, sct)
 
 
 def 走到目标(目的坐标, model, sct, 按键, 横轴偏差=0, 纵轴偏差=0):
@@ -439,6 +673,11 @@ def is距离近(人物坐标, 目的坐标, X距离, Y距离):
     else:
         return True
 
+
+def isBoss房间(sct):
+    pass
+def Boss房间处理():
+    pass
 
 # 调用函数
 if __name__ == '__main__':
