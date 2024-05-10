@@ -1,5 +1,9 @@
+import random
+import time
+
 import win32con
 import win32gui
+from ultralytics import YOLO
 
 from 识字类 import *
 from 键鼠类 import *
@@ -129,16 +133,21 @@ def 选图(地图名):
     key_press_release('space')
 
 
-def 打怪():
-    pass
+def 打怪(model, sct, 按键):
+    怪物坐标 = 获取怪物坐标(model, sct)
+    while 怪物坐标 != (0, 0):
+        跑到目标(怪物坐标, model, sct, 按键)
+        技能列表 = 获取技能可用列表(sct)
+        释放技能(技能列表)
 
 
 def 捡物():
     pass
 
 
-def 过图():
-    pass
+def 过图(model, sct,按键):
+    门坐标 = 获取门坐标(model,sct)
+    跑到目标(门坐标, model, sct, 按键)
 
 
 def 跑到目标(目的坐标, model, sct, 按键, 横轴偏差=0, 纵轴偏差=0):
@@ -160,7 +169,7 @@ def 跑到目标(目的坐标, model, sct, 按键, 横轴偏差=0, 纵轴偏差=
         return
         # 向右走
     if 目的坐标[0] > 实时坐标[0] and 目的坐标[1] == 实时坐标[1]:
-        按键.key_press_release('right')
+        key_press_release('right')
         按键.key_press('right')
         while True:
             当前时间 = time.time()
@@ -183,7 +192,7 @@ def 跑到目标(目的坐标, model, sct, 按键, 横轴偏差=0, 纵轴偏差=
             实时坐标 = 获取人物坐标(model, sct)
     # 向左走
     if 目的坐标[0] < 实时坐标[0] and 目的坐标[1] == 实时坐标[1]:
-        按键.key_press_release('left')
+        key_press_release('left')
         按键.key_press('left')
         while True:
             当前时间 = time.time()
@@ -250,7 +259,7 @@ def 跑到目标(目的坐标, model, sct, 按键, 横轴偏差=0, 纵轴偏差=
             实时坐标 = 获取人物坐标(model, sct)
     # 向右上走
     if 目的坐标[0] > 实时坐标[0] and 目的坐标[1] < 实时坐标[1]:
-        按键.key_press_release('right')
+        key_press_release('right')
         按键.key_press('right')
         按键.key_press('up')
         while True:
@@ -284,7 +293,7 @@ def 跑到目标(目的坐标, model, sct, 按键, 横轴偏差=0, 纵轴偏差=
             实时坐标 = 获取人物坐标(model, sct)
     # 向右下走
     if 目的坐标[0] > 实时坐标[0] and 目的坐标[1] > 实时坐标[1]:
-        按键.key_press_release('right')
+        key_press_release('right')
         按键.key_press('right')
         按键.key_press('down')
         while True:
@@ -318,7 +327,7 @@ def 跑到目标(目的坐标, model, sct, 按键, 横轴偏差=0, 纵轴偏差=
             实时坐标 = 获取人物坐标(model, sct)
     # 向左上走
     if 目的坐标[0] < 实时坐标[0] and 目的坐标[1] < 实时坐标[1]:
-        按键.key_press_release('left')
+        key_press_release('left')
         按键.key_press('left')
         按键.key_press('up')
         while True:
@@ -352,7 +361,7 @@ def 跑到目标(目的坐标, model, sct, 按键, 横轴偏差=0, 纵轴偏差=
             实时坐标 = 获取人物坐标(model, sct)
     # 向左下走
     if 目的坐标[0] < 实时坐标[0] and 目的坐标[1] > 实时坐标[1]:
-        按键.key_press_release('left')
+        key_press_release('left')
         按键.key_press('left')
         按键.key_press('down')
         while True:
@@ -637,9 +646,44 @@ def 获取人物坐标(model, sct):
     return 0, 0
 
 
+def 获取怪物坐标(model, sct):
+    sct_img = sct.grab((0, 0, 800, 600))
+    img = np.array(sct_img)[:, :, :3]
+    img = img.astype(np.uint8)
+    results = model(img)  # 对图像进行预测
+    #
+    for r in results:
+        boxes = r.boxes  # Boxes object for bbox outputs
+        # img = r.plot(img=img)
+        # #Boss,LittleBoss,Hero,Monster,Door,Object
+        for box in boxes:
+            if r.names[int(np.array(box.cls.cpu())[0])] == "Boss" \
+                    or r.names[int(np.array(box.cls.cpu())[0])] == "LittleBoss" \
+                    or r.names[int(np.array(box.cls.cpu())[0])] == "Monster":
+                loc = np.array(box.xyxy.cpu())[0]
+                return (loc[2] + loc[0]) / 2, loc[3]
+    return 0, 0
+
+
+def 获取门坐标(model, sct):
+    sct_img = sct.grab((0, 0, 800, 600))
+    img = np.array(sct_img)[:, :, :3]
+    img = img.astype(np.uint8)
+    results = model(img)  # 对图像进行预测
+    #
+    for r in results:
+        boxes = r.boxes  # Boxes object for bbox outputs
+        # img = r.plot(img=img)
+        # #Boss,LittleBoss,Hero,Monster,Door,Object
+        for box in boxes:
+            if r.names[int(np.array(box.cls.cpu())[0])] == "Door":
+                loc = np.array(box.xyxy.cpu())[0]
+                return (loc[2] + loc[0]) / 2, loc[3]
+    return 0, 0
+
+
 def 取当前房间(sct):
     """先扫描颜色，再确定坐标，计算出房间号"""
-    门开 = False
     sct_img = sct.grab(小地图位置)
     img = Image.frombytes('RGB', (sct_img.width, sct_img.height), sct_img.rgb)
 
@@ -649,17 +693,40 @@ def 取当前房间(sct):
     列数 = len(小地图路径.地图数据[0])
     房间宽度 = (小地图位置[2] - 小地图位置[0]) / 列数
     房间高度 = (小地图位置[3] - 小地图位置[1]) / 行数
-    for x in range(行数):
-        for y in range(列数):
-            房间起始 = 小地图位置[0]
+
     # 遍历每个像素
     for x in range(0, img.width, 小地图遍历步长):
         for y in range(0, img.height, 小地图遍历步长):
             # 获取位于 (x, y) 的像素的 RGB 颜色值
             color = pixels[x, y]
-            if color == 小地图角色颜色:
+            if 小地图角色颜色[0] > color[0] and color[1] > 小地图角色颜色[1] and color[2] > 小地图角色颜色[2]:
                 # 向下取整
-                返回值 = ((x - 小地图位置[0]) // 房间宽度, (y - 小地图位置[1]) // 房间高度)
+                返回值 = (int(y // 房间宽度), int(x // 房间高度))
+                return 返回值
+    返回值 = (0, 0)
+    return 返回值
+
+
+def 取Boss房间(sct):
+    """先扫描颜色，再确定坐标，计算出房间号"""
+    sct_img = sct.grab(小地图位置)
+    img = Image.frombytes('RGB', (sct_img.width, sct_img.height), sct_img.rgb)
+
+    # 加载图像的像素数据
+    pixels = img.load()
+    行数 = len(小地图路径.地图数据)
+    列数 = len(小地图路径.地图数据[0])
+    房间宽度 = (小地图位置[2] - 小地图位置[0]) / 列数
+    房间高度 = (小地图位置[3] - 小地图位置[1]) / 行数
+
+    # 遍历每个像素
+    for x in range(0, img.width, 小地图遍历步长):
+        for y in range(0, img.height, 小地图遍历步长):
+            # 获取位于 (x, y) 的像素的 RGB 颜色值
+            color = pixels[x, y]
+            if color[0] > 小地图Boss颜色[0] and color[1] < 小地图Boss颜色[1] and color[2] < 小地图Boss颜色[2]:
+                # 向下取整
+                返回值 = (int(y // 房间宽度), int(x // 房间高度))
                 return 返回值
     返回值 = (0, 0)
     return 返回值
@@ -675,11 +742,93 @@ def is距离近(人物坐标, 目的坐标, X距离, Y距离):
 
 
 def isBoss房间(sct):
-    pass
-def Boss房间处理():
-    pass
+    if 取当前房间(sct) == (0, 0) and 取Boss房间(sct) != (0, 0):
+        return True
+    else:
+        return False
+
+
+def Boss房间处理(识字):
+    while not 识字.is通关():
+        技能列表 = 获取技能可用列表(识字.get_sct())
+        if 'ctrl' in 技能列表:
+            key_press_release('ctrl')
+        elif 'alt' in 技能列表:
+            key_press_release('alt')
+        else:
+            释放技能(技能列表)
+    key_press_release('v')
+    time.sleep(0.5)
+    key_press_release('esc')
+    time.sleep(2)
+    key_press_release('a')
+    time.sleep(0.5)
+    key_press_release('space')
+    time.sleep(0.5)
+    key_press_release('left')
+    time.sleep(0.5)
+    key_press_release('space')
+    time.sleep(0.5)
+    key_press_release('esc')
+    time.sleep(0.5)
+    if 有疲劳(识字.get_sct()):
+        key_press_release('f10')
+    else:
+        key_press_release('f12')
+
+
+def 有疲劳(sct):
+    sct_img = sct.grab(疲劳位置)
+    rgb = np.array(sct_img)
+    color = rgb[0, 0]
+    color = (color[2], color[1], color[0])
+    if color == 疲劳颜色:
+        return True
+    else:
+        return False
+
+
+def 释放技能(技能列表):
+    if 技能列表 is None or len(技能列表) == 0:
+        return
+    技能 = 'alt'
+    while 技能 == 'alt' or 技能 == 'ctrl':
+        技能 = random.choice(技能列表)
+        continue
+    key_press_release(技能)
+
+
+def 获取技能可用列表(sct):
+    """先扫描颜色，再确定坐标，计算出技能位置"""
+    sct_img = sct.grab(技能位置)
+    img = Image.frombytes('RGB', (sct_img.width, sct_img.height), sct_img.rgb)
+
+    # 加载图像的像素数据qwerty ctl
+    pixels = img.load()
+    行数 = 2
+    列数 = 7
+    可用技能列表 = []
+    技能宽度 = img.width / 列数
+    技能高度 = img.height / 行数
+    for x in range(0, img.width, 小地图遍历步长):
+        for y in range(0, img.height, 小地图遍历步长):
+            # 获取位于 (x, y) 的像素的 RGB 颜色值
+            color = pixels[x, y]
+            if color[0] == 技能颜色[0] and color[1] == 技能颜色[1]:  #这里最好改成某个范围内
+                可用技能列表.append(技能字典[int(y // 技能高度), int(x // 技能宽度)])
+                continue
+
+    return list(set(可用技能列表))  # 去重
+
 
 # 调用函数
 if __name__ == '__main__':
-    with mss.mss() as sct:
-        取当前房间(sct)
+    #time.sleep(2)
+
+    识字 = 识字初始化()
+    按键 = KeyController()
+    key_press_release('right')
+    按键.key_press('right')
+    按键.key_press('up')
+    #model = YOLO("best.pt")
+    #过图(model, 识字.get_sct(), 按键)

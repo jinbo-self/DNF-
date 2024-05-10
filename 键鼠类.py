@@ -17,9 +17,12 @@ def mouse_click():
     pydirectinput.mouseDown()
     time.sleep(0.1)
     pydirectinput.mouseUp()
-def mouse_mov_click(x,y):
+
+
+def mouse_mov_click(x, y):
     mouse_move(int(x), int(y))  # 移动鼠标到(x, y)
     mouse_click()  # 单击鼠标左键
+
 
 def key_press_release(key_name, delay=0.01):
     """
@@ -35,6 +38,8 @@ def key_press_release(key_name, delay=0.01):
 
     # 释放按键
     pydirectinput.keyUp(key_name)
+
+
 class KeyController:
     def __init__(self):
         self.events = {}
@@ -87,9 +92,8 @@ class KeyController:
 
 # 使用示例
 if __name__ == "__main__":
-    mouse_mov_click(1412,486)
+    mouse_mov_click(1412, 486)
     time.sleep(1)
     key_press_release('1')
     time.sleep(1)
     key_press_release('2')
-

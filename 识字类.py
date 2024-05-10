@@ -108,7 +108,11 @@ class 识字初始化:
             return False
 
     def is通关(self):
-        pass
+        字符 = self.识字(跳过翻牌)
+        if "跳过" in 字符:
+            return True
+        else:
+            return False
 
 
 if __name__ == '__main__':
