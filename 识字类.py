@@ -21,7 +21,6 @@ class 识字初始化:
         return self.sct
 
     def 识字(self, region):
-
         sct_img = self.sct.grab(region)
         # 将捕获的数据转换为PIL.Image对象
         self.img = Image.frombytes('RGB', (sct_img.width, sct_img.height), sct_img.rgb)
@@ -52,21 +51,21 @@ class 识字初始化:
 
     def in城镇(self):
         字符 = self.识字(人物)
-        if 字符 == "人物":
+        if "人物" in 字符:
             return True
         else:
             return False
 
     def in赛利亚房间(self):
         字符 = self.识字(赛丽亚)
-        if 字符 == "赛丽亚":
+        if "赛丽亚" in 字符:
             return True
         else:
             return False
 
     def is公告界面(self):
         字符 = self.识字(公告_关闭)
-        if 字符 == "关闭":
+        if "关闭" in 字符:
             return True
         else:
             return False
@@ -81,11 +80,11 @@ class 识字初始化:
     def is开门(self, 当前房间):
         行数 = len(小地图路径.地图数据)
         列数 = len(小地图路径.地图数据[0])
-        房间宽度 = (小地图位置[2] - 小地图位置[0]) / 列数
-        房间高度 = (小地图位置[3] - 小地图位置[1]) / 行数
+        房间宽度 = int((小地图位置[2] - 小地图位置[0]) / 列数)
+        房间高度 = int((小地图位置[3] - 小地图位置[1]) / 行数)
         #当前房间左上角坐标
-        当前房间x = 小地图位置[0] + 当前房间[0] * 房间宽度
-        当前房间y = 小地图位置[1] + 当前房间[1] * 房间高度
+        当前房间x = int(小地图位置[0] + 当前房间[1] * 房间宽度)
+        当前房间y = int(小地图位置[1] + 当前房间[0] * 房间高度)
         #当前房间左边
         if self.识字((当前房间x - 房间宽度, 当前房间y, 当前房间x, 当前房间y + 房间高度)) == '?' or self.识字(
                 (当前房间x - 房间宽度, 当前房间y, 当前房间x, 当前房间y + 房间高度)) == '？':
@@ -97,12 +96,12 @@ class 识字初始化:
         #当前房间右边
         elif self.识字(
                 (当前房间x + 房间宽度, 当前房间y, 当前房间x + 房间宽度 * 2, 当前房间y + 房间高度)) == '?' or self.识字(
-                (当前房间x + 房间宽度, 当前房间y, 当前房间x + 房间宽度 * 2, 当前房间y + 房间高度)) == '？':
+            (当前房间x + 房间宽度, 当前房间y, 当前房间x + 房间宽度 * 2, 当前房间y + 房间高度)) == '？':
             return True
         # 当前房间下边
         elif self.识字(
                 (当前房间x, 当前房间y + 房间高度, 当前房间x + 房间宽度, 当前房间y + 2 * 房间高度)) == '?' or self.识字(
-                (当前房间x, 当前房间y + 房间高度, 当前房间x + 房间宽度, 当前房间y + 2 * 房间高度)) == '？':
+            (当前房间x, 当前房间y + 房间高度, 当前房间x + 房间宽度, 当前房间y + 2 * 房间高度)) == '？':
             return True
         else:
             return False
@@ -115,6 +114,9 @@ class 识字初始化:
             return False
 
 
+
 if __name__ == '__main__':
-    识字 = 识字初始化()
-    print(识字.识字((721, 84, 737, 98)))
+    pass
+    # 识字 = 识字初始化()
+    # while True:
+    #     print(识字.识字(人物))
